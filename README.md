@@ -2,6 +2,15 @@
 
 **Veewoo Timer** is a Next.js PWA (Progressive Web App) that works as a **daily task timer** with a Pomodoro-style 25-minute focus timer. You pick tasks, run the timer, and it tracks time per task.
 
+## Tech stack
+
+- **Framework** — Next.js 14, React 18
+- **Language** — TypeScript
+- **UI** — Chakra UI, react-icons
+- **Data & state** — TanStack React Query
+- **Database** — Google Sheets (via Google Sheets API)
+- **PWA** — next-pwa
+
 ## Run the project
 
 ### Prerequisites
