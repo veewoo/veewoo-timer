@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 
-import nextPWA from "next-pwa";
+import { randomUUID } from "node:crypto";
+import withSerwistInit from "@serwist/next";
 
-const withPWA = nextPWA({
-  dest: "public",
+const withSerwist = withSerwistInit({
+  additionalPrecacheEntries: [{ url: "/~offline", revision: randomUUID() }],
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
 });
 
-const nextConfig = withPWA({
+const nextConfig = withSerwist({
   reactStrictMode: false,
 });
 

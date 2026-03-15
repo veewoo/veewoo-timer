@@ -36,8 +36,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# PWA
-/public/sw.js
-/public/sw.js.map
+# PWA / Serwist
+public/sw*
+public/swe-worker*
 /public/workbox-*.js
 /public/workbox-*.js.map
