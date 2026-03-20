@@ -3,7 +3,7 @@ import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
 import { Task } from "@/types";
 import { calculateElapsedTime, formatTime } from "@/utils";
-import { Box, Button, Stack, useToast, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, useToast, Text } from "@chakra-ui/react";
 import { FaRedo } from "react-icons/fa";
 
 type TaskCardProps = {
@@ -77,75 +77,74 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     }
   };
 
+  const elapsed = formatTime(
+    inProgressTask
+      ? task.secondsCounted + calculateElapsedTime(inProgressTask.startTime)
+      : task.secondsCounted
+  );
+
   return (
     <Box
       py={2}
-      px={4}
+      px={3}
       width="100%"
       cursor="pointer"
       borderWidth="1px"
-      borderRadius="lg"
+      borderRadius="full"
       overflow="hidden"
       transition="all 0.2s"
       bg={isSelected ? "teal" : "white"}
-      boxShadow={isSelected ? "xl" : "lg"}
+      boxShadow={isSelected ? "xl" : "sm"}
       onClick={handleClickTask}
-      _hover={{ boxShadow: "xl", transform: "scale(1.02)" }}
+      _hover={{ boxShadow: "md", transform: "translateY(-1px)" }}
     >
-      <Stack direction="row" alignItems="center" justify="space-between">
-        <Box>
-          <Text
-            fontSize="sm"
-            fontWeight="bold"
-            color={isSelected ? "white" : undefined}
-          >
-            {task.name}
-          </Text>
-          <Text fontSize="sm" color={isSelected ? "white" : "gray.500"}>
-            {formatTime(
-              inProgressTask
-                ? task.secondsCounted +
-                    calculateElapsedTime(inProgressTask.startTime)
-                : task.secondsCounted
-            )}
-          </Text>
-        </Box>
-        <Stack
+      <Flex align="center" gap={3} minH="32px" wrap="nowrap">
+        <Text
+          as="span"
           flex="1"
-          direction="row"
-          alignItems="center"
-          justifyContent="flex-end"
+          minW={0}
+          fontSize="sm"
+          fontWeight="semibold"
+          color={isSelected ? "white" : "gray.800"}
+          noOfLines={1}
         >
+          {task.name}
+        </Text>
+        <Text
+          as="span"
+          flexShrink={0}
+          fontSize="sm"
+          color={isSelected ? "whiteAlpha.900" : "gray.600"}
+          sx={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {elapsed}
+        </Text>
+        {task?.lastModified ? (
           <Text
-            fontSize="sm"
+            as="span"
+            flexShrink={0}
+            display={{ base: "none", md: "inline" }}
+            maxW="140px"
+            fontSize="xs"
             fontStyle="italic"
-            color={isSelected ? "white" : "gray.500"}
+            color={isSelected ? "whiteAlpha.800" : "gray.500"}
+            noOfLines={1}
           >
-            {task?.lastModified ? `${task.lastModified}` : ""}
+            {task.lastModified}
           </Text>
-          {/* <Button
-            size="xs"
-            colorScheme="red"
-            isDisabled={isLoading}
-            variant={isSelected ? "solid" : "outline"}
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteTask(task.id);
-            }}
-          >
-            <FaTrash />
-          </Button> */}
-          <Button
-            size="xs"
-            colorScheme="blue"
-            isDisabled={isLoading}
-            variant={isSelected ? "solid" : "outline"}
-            onClick={handleResetTask}
-          >
-            <FaRedo />
-          </Button>
-        </Stack>
-      </Stack>
+        ) : null}
+        <Button
+          flexShrink={0}
+          size="xs"
+          colorScheme="blue"
+          isDisabled={isLoading}
+          variant={isSelected ? "solid" : "outline"}
+          borderRadius="full"
+          onClick={handleResetTask}
+        >
+          <FaRedo />
+        </Button>
+      </Flex>
     </Box>
   );
 };
