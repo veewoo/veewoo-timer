@@ -16,22 +16,44 @@ const TaskList: React.FC<TaskListProps> = ({}) => {
   return (
     <Box mb={4}>
       <List spacing={3}>
-        {tasks.map((task, index) => (
-          <Collapse
-            key={`task-${task.id}`}
-            style={{
-              overflow: "",
-              zIndex: index,
-              position: "relative",
-              background: "transparent",
-            }}
-            in={timerState != "active" || task.id === selectedTask?.id}
-          >
-            <ListItem>
-              <TaskCard task={task} />
-            </ListItem>
-          </Collapse>
-        ))}
+        {tasks.map((task, index) => {
+          const visible =
+            timerState !== "active" || task.id === selectedTask?.id;
+          const isSelected = task.id === selectedTask?.id;
+
+          if (isSelected) {
+            return (
+              <Box
+                py={1}
+                bottom={2}
+                position="sticky"
+                zIndex={tasks.length}
+                key={`task-${task.id}`}
+              >
+                <ListItem>
+                  <TaskCard task={task} />
+                </ListItem>
+              </Box>
+            );
+          }
+
+          return (
+            <Collapse
+              in={visible}
+              key={`task-${task.id}`}
+              style={{
+                overflow: "", // Prevent inner component to be cut off
+                zIndex: index,
+                position: "relative",
+                background: "transparent",
+              }}
+            >
+              <ListItem>
+                <TaskCard task={task} />
+              </ListItem>
+            </Collapse>
+          );
+        })}
       </List>
     </Box>
   );
