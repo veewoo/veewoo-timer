@@ -90,7 +90,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       width="100%"
       cursor="pointer"
       borderWidth="1px"
-      borderRadius="full"
+      borderRadius="lg"
       overflow="hidden"
       transition="all 0.2s"
       bg={isSelected ? "teal" : "white"}
