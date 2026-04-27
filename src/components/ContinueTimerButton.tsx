@@ -11,7 +11,6 @@ const ContinueTimerButton = () => {
   return (
     <IconButton
       aria-label="Continue timer"
-      icon={<FaRecycle />}
       size="sm"
       colorScheme={continueTimerOnEnd ? "blue" : "gray"}
       onClick={() => {
@@ -19,7 +18,9 @@ const ContinueTimerButton = () => {
           type: "TOGGLE_CONTINUE_TIMER_ON_END",
         });
       }}
-    />
+    >
+      <FaRecycle />
+    </IconButton>
   );
 };
 

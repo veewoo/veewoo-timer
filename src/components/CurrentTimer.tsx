@@ -6,8 +6,8 @@ import {
   Button,
   Text,
   Stack,
-  CircularProgress,
-  CircularProgressLabel,
+  ProgressCircle,
+  AbsoluteCenter,
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
@@ -103,44 +103,46 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
         alignItems="center"
       >
         {variant === "default" && (
-          <CircularProgress
+          <ProgressCircle.Root
             value={((MINUTES_25 - remainingTime) / MINUTES_25) * 100}
-            size="200px"
-            thickness="8px"
-            color="teal.500"
             mb={4}
           >
-            <CircularProgressLabel>
-              <Text fontSize="4xl" fontWeight="bold" color="teal.500">
+            <ProgressCircle.Circle
+              css={{
+                "--size": "200px",
+                "--thickness": "12px",
+              }}
+            >
+              <ProgressCircle.Track />
+              <ProgressCircle.Range />
+            </ProgressCircle.Circle>
+            <AbsoluteCenter>
+              <ProgressCircle.ValueText fontSize="4xl" fontWeight="bold">
                 {formatTime(remainingTime)}
-              </Text>
-            </CircularProgressLabel>
-          </CircularProgress>
+              </ProgressCircle.ValueText>
+            </AbsoluteCenter>
+          </ProgressCircle.Root>
         )}
         {variant === "embed" && (
           <Text fontSize="xl" fontWeight="bold" color="teal.500">
             {formatTime(remainingTime)}
           </Text>
         )}
-        <Stack direction="row" spacing={2} justify="center">
+        <Stack direction="row" gap={2} justify="center">
           {(timerState === "paused" || timerState == "stopped") && (
             <Button
               size="sm"
               colorScheme="teal"
               onClick={startTimer}
-              leftIcon={<FaPlay />}
-              isDisabled={!selectedTask}
+              disabled={!selectedTask}
             >
+              <FaPlay />
               Start
             </Button>
           )}
           {timerState === "active" && (
-            <Button
-              size="sm"
-              colorScheme="yellow"
-              onClick={pauseTimer}
-              leftIcon={<FaPause />}
-            >
+            <Button size="sm" colorScheme="yellow" onClick={pauseTimer}>
+              <FaPause />
               Pause
             </Button>
           )}

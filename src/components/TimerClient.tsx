@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Box, Container, useToast } from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 import TaskList from "../components/TaskList";
 import AlertDialogComponent from "../components/AlertDialogComponent";
 import TopBar from "../components/TopBar";
@@ -11,9 +11,9 @@ import { MINUTES_25 } from "@/constants";
 import { calculateElapsedTime, formatTimeByDate } from "@/utils";
 import { useSearchParams } from "next/navigation";
 import CurrentTimer from "@/components/CurrentTimer";
+import { toaster } from "./ui/toaster";
 
 const TimerClient: React.FC = () => {
-  const toast = useToast();
   const searchParams = useSearchParams();
   const {
     state: { timerState },
@@ -94,11 +94,11 @@ const TimerClient: React.FC = () => {
     } catch (error) {
       console.error(error);
 
-      toast({
+      toaster.create({
         duration: 5000,
-        isClosable: true,
+        closable: true,
         title: "Error",
-        status: "error",
+        type: "error",
         description: "An error occurred while saving the task",
       });
     }
@@ -139,11 +139,11 @@ const TimerClient: React.FC = () => {
     } catch (error) {
       console.error(error);
 
-      toast({
+      toaster.create({
         duration: 5000,
-        isClosable: true,
+        closable: true,
         title: "Error",
-        status: "error",
+        type: "error",
         description: "An error occurred while saving the task",
       });
     }

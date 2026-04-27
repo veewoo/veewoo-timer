@@ -1,12 +1,7 @@
 import React from "react";
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
   Button,
+  Dialog,
 } from "@chakra-ui/react";
 
 interface AlertDialogComponentProps {
@@ -23,32 +18,35 @@ const AlertDialogComponent: React.FC<AlertDialogComponentProps> = ({
   cancelRef,
 }) => {
   return (
-    <AlertDialog
-      isOpen={isOpen}
-      leastDestructiveRef={cancelRef}
-      onClose={onClose}
+    <Dialog.Root
+      role="alertdialog"
+      open={isOpen}
+      onOpenChange={(details) => {
+        if (!details.open) onClose();
+      }}
     >
-      <AlertDialogOverlay>
-        <AlertDialogContent>
-          <AlertDialogHeader fontSize="lg" fontWeight="bold">
-            Timer Finished
-          </AlertDialogHeader>
-
-          <AlertDialogBody>
+      <Dialog.Backdrop />
+      <Dialog.Positioner>
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title fontSize="lg" fontWeight="bold">
+              Timer Finished
+            </Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
             The timer has finished. Would you like to continue?
-          </AlertDialogBody>
-
-          <AlertDialogFooter>
+          </Dialog.Body>
+          <Dialog.Footer>
             <Button ref={cancelRef} onClick={onClose}>
               Cancel
             </Button>
             <Button colorScheme="teal" onClick={onContinue} ml={3}>
               Continue
             </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialogOverlay>
-    </AlertDialog>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    </Dialog.Root>
   );
 };
 

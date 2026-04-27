@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Switch, FormControl, FormLabel } from "@chakra-ui/react";
+import { Field, Switch } from "@chakra-ui/react";
 import { useSettings } from "../context/SettingsContext";
 
 const WakeLockSwitch = () => {
@@ -56,17 +56,27 @@ const WakeLockSwitch = () => {
   };
 
   return (
-    <FormControl display="flex" alignItems="center">
-      <FormLabel htmlFor="wake-lock-switch" mb="0">
+    <Field.Root
+      orientation="horizontal"
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+    >
+      <Field.Label htmlFor="wake-lock-switch" mb="0">
         Enable Wake Lock
-      </FormLabel>
-      <Switch
+      </Field.Label>
+      <Switch.Root
         id="wake-lock-switch"
-        isChecked={!!wakeLock}
-        isDisabled={!isSupported}
-        onChange={handleSwitchChange}
-      />
-    </FormControl>
+        checked={!!wakeLock}
+        disabled={!isSupported}
+        onCheckedChange={handleSwitchChange}
+      >
+        <Switch.HiddenInput />
+        <Switch.Control>
+          <Switch.Thumb />
+        </Switch.Control>
+      </Switch.Root>
+    </Field.Root>
   );
 };
 

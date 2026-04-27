@@ -3,15 +3,15 @@ import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
 import { Task } from "@/types";
 import { calculateElapsedTime, formatTime } from "@/utils";
-import { Box, Button, Flex, useToast, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FaRedo } from "react-icons/fa";
+import { toaster } from "./ui/toaster";
 
 type TaskCardProps = {
   task: Task;
 };
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
-  const toasts = useToast();
   const {
     state: { timerState },
     dispatch: timerDispatch,
@@ -56,12 +56,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       taskDispatch({ type: "SET_IN_PROGRESS_TASK", payload: null });
     } catch (error) {
       console.error(error);
-      toasts({
+      toaster.create({
         title: "Error",
         description: "An error occurred while resetting the task.",
-        status: "error",
+        type: "error",
         duration: 5000,
-        isClosable: true,
+        closable: true,
       });
     }
   };
@@ -80,7 +80,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const elapsed = formatTime(
     inProgressTask
       ? task.secondsCounted + calculateElapsedTime(inProgressTask.startTime)
-      : task.secondsCounted
+      : task.secondsCounted,
   );
 
   return (
@@ -90,13 +90,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       width="100%"
       cursor="pointer"
       borderWidth="1px"
-      borderRadius="lg"
-      overflow="hidden"
-      transition="all 0.2s"
-      bg={isSelected ? "teal" : "white"}
-      boxShadow={isSelected ? "xl" : "sm"}
+      borderRadius="md"
       onClick={handleClickTask}
-      _hover={{ boxShadow: "md", transform: "translateY(-1px)" }}
+      bg={isSelected ? "gray.950" : "white"}
     >
       <Flex align="center" gap={3} minH="32px" wrap="nowrap">
         <Text
@@ -106,7 +102,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           fontSize="sm"
           fontWeight="semibold"
           color={isSelected ? "white" : "gray.800"}
-          noOfLines={1}
+          lineClamp={1}
         >
           {task.name}
         </Text>
@@ -115,7 +111,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           flexShrink={0}
           fontSize="sm"
           color={isSelected ? "whiteAlpha.900" : "gray.600"}
-          sx={{ fontVariantNumeric: "tabular-nums" }}
+          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {elapsed}
         </Text>
@@ -128,19 +124,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             fontSize="xs"
             fontStyle="italic"
             color={isSelected ? "whiteAlpha.800" : "gray.500"}
-            noOfLines={1}
+            lineClamp={1}
           >
             {task.lastModified}
           </Text>
         ) : null}
         <Button
           flexShrink={0}
-          size="xs"
-          colorScheme="blue"
-          isDisabled={isLoading}
-          variant={isSelected ? "solid" : "outline"}
-          borderRadius="full"
+          size="2xs"
+          disabled={isLoading}
           onClick={handleResetTask}
+          variant={isSelected ? "solid" : "outline"}
         >
           <FaRedo />
         </Button>
