@@ -12,7 +12,7 @@ const ContinueTimerButton = () => {
     <IconButton
       aria-label="Continue timer"
       size="sm"
-      colorScheme={continueTimerOnEnd ? "blue" : "gray"}
+      colorPalette={continueTimerOnEnd ? "blue" : "gray"}
       onClick={() => {
         settingsDispatch({
           type: "TOGGLE_CONTINUE_TIMER_ON_END",

@@ -130,18 +130,13 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
         )}
         <Stack direction="row" gap={2} justify="center">
           {(timerState === "paused" || timerState == "stopped") && (
-            <Button
-              size="sm"
-              colorScheme="teal"
-              onClick={startTimer}
-              disabled={!selectedTask}
-            >
+            <Button size="sm" onClick={startTimer} disabled={!selectedTask}>
               <FaPlay />
               Start
             </Button>
           )}
           {timerState === "active" && (
-            <Button size="sm" colorScheme="yellow" onClick={pauseTimer}>
+            <Button size="sm" colorPalette="yellow" onClick={pauseTimer}>
               <FaPause />
               Pause
             </Button>

@@ -40,7 +40,7 @@ const AlertDialogComponent: React.FC<AlertDialogComponentProps> = ({
             <Button ref={cancelRef} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme="teal" onClick={onContinue} ml={3}>
+            <Button colorPalette="teal" onClick={onContinue} ml={3}>
               Continue
             </Button>
           </Dialog.Footer>
