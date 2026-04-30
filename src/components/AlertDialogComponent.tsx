@@ -21,6 +21,7 @@ const AlertDialogComponent: React.FC<AlertDialogComponentProps> = ({
     <Dialog.Root
       role="alertdialog"
       open={isOpen}
+      initialFocusEl={() => cancelRef.current}
       onOpenChange={(details) => {
         if (!details.open) onClose();
       }}
