@@ -47,13 +47,6 @@ const TimerClient: React.FC = () => {
     }
   }, [inProgressTask]);
 
-  const onCloseAlert = () => {
-  };
-
-  const onContinue = () => {
-    timerDispatch({ type: "START_TIMER" });
-  };
-
   const handleTimerStart = async () => {
     await saveInProgressTaskAsync(selectedTask!.id);
   };
@@ -78,7 +71,7 @@ const TimerClient: React.FC = () => {
     taskDispatch({
       type: "SET_TASKS",
       payload: tasks.map((task) =>
-        task.id === selectedTask.id ? newSelectedTask : task
+        task.id === selectedTask.id ? newSelectedTask : task,
       ),
     });
 
@@ -123,7 +116,7 @@ const TimerClient: React.FC = () => {
     taskDispatch({
       type: "SET_TASKS",
       payload: tasks.map((task) =>
-        task.id === selectedTask.id ? newSelectedTask : task
+        task.id === selectedTask.id ? newSelectedTask : task,
       ),
     });
 
