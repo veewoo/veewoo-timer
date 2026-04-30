@@ -26,9 +26,6 @@ const TimerClient: React.FC = () => {
     removeInProgressTaskAsync,
   } = useTask();
 
-  const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
   const embed = searchParams.get("embed");
   const taskId = searchParams.get("taskId");
 
@@ -140,11 +137,10 @@ const TimerClient: React.FC = () => {
 
   return (
     <Container
-      ref={containerRef}
-      py={embed ? 0 : 4}
       gap={8}
+      maxW="4xl"
       display="flex"
-      maxWidth="container.md"
+      py={embed ? 0 : 4}
       flexDirection={{ base: "column", sm: "row" }}
     >
       <CurrentTimer
