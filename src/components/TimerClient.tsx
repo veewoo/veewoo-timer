@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Box, Container } from "@chakra-ui/react";
 import TaskList from "../components/TaskList";
-import AlertDialogComponent from "../components/AlertDialogComponent";
 import TopBar from "../components/TopBar";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
@@ -26,7 +25,6 @@ const TimerClient: React.FC = () => {
     saveInProgressTaskAsync,
     removeInProgressTaskAsync,
   } = useTask();
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -50,11 +48,9 @@ const TimerClient: React.FC = () => {
   }, [inProgressTask]);
 
   const onCloseAlert = () => {
-    setIsAlertOpen(false);
   };
 
   const onContinue = () => {
-    setIsAlertOpen(false);
     timerDispatch({ type: "START_TIMER" });
   };
 
@@ -170,12 +166,6 @@ const TimerClient: React.FC = () => {
           <TaskList />
         </Box>
       )}
-      <AlertDialogComponent
-        isOpen={isAlertOpen}
-        cancelRef={cancelRef}
-        onClose={onCloseAlert}
-        onContinue={onContinue}
-      />
     </Container>
   );
 };
