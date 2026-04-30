@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IconButton, useToast } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
+import { toaster } from "./ui/toaster";
 
 const WakeLockButton = () => {
   const [isSupported, setIsSupported] = useState<boolean>(true);
-  const toast = useToast();
-
   useEffect(() => {
     if (!("wakeLock" in navigator)) {
       setIsSupported(false);
@@ -23,9 +22,9 @@ const WakeLockButton = () => {
       });
 
       console.log("Wake Lock is active");
-      toast({
+      toaster.create({
         title: "Screen will stay on",
-        status: "success",
+        type: "success",
         duration: 2000,
       });
     } catch (err) {
@@ -35,9 +34,9 @@ const WakeLockButton = () => {
         console.error("An unknown error occurred");
       }
       setIsSupported(false);
-      toast({
+      toaster.create({
         title: "Failed to keep screen on",
-        status: "error",
+        type: "error",
         duration: 2000,
       });
     }
@@ -51,10 +50,11 @@ const WakeLockButton = () => {
     <IconButton
       size="sm"
       aria-label="Keep Screen On"
-      icon={<FaLock />}
       onClick={handleButtonClick}
-      isDisabled={!isSupported}
-    />
+      disabled={!isSupported}
+    >
+      <FaLock />
+    </IconButton>
   );
 };
 

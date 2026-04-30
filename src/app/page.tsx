@@ -1,9 +1,11 @@
-import TimerClient from "@/components/TimerClient";
+"use client";
+
 import { Suspense } from "react";
+import TimerClient from "@/components/TimerClient";
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={null}>
       <TimerClient />
     </Suspense>
   );

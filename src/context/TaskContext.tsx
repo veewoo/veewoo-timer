@@ -21,9 +21,9 @@ import {
   ReactNode,
   Dispatch,
 } from "react";
-import { useToast } from "@chakra-ui/react";
 import { calculateElapsedTime } from "@/utils";
 import { MINUTES_25 } from "@/constants";
+import { toaster } from "@/components/ui/toaster";
 
 interface TaskState {
   tasks: Task[];
@@ -84,7 +84,6 @@ const taskReducer = (state: TaskState, action: TaskAction): TaskState => {
 export const TaskProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const toast = useToast();
   const [state, dispatch] = useReducer(taskReducer, initialState);
 
   const { isFetching: isFetchingTasks, refetch: refetchTasks } = useQuery(
@@ -126,11 +125,11 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
           );
 
           if (!newSelectedTask) {
-            toast({
+            toaster.create({
               duration: 5000,
-              isClosable: true,
+              closable: true,
               title: "Error",
-              status: "error",
+              type: "error",
               description: "Selected task not found"
             });
             return;

@@ -1,4 +1,4 @@
-import { Box, List, ListItem, Collapse } from "@chakra-ui/react";
+import { Box, Collapsible, List } from "@chakra-ui/react";
 import TaskCard from "./TaskCard";
 import { useTimer } from "@/context/TimerStateContext";
 import { useTask } from "@/context/TaskContext";
@@ -15,7 +15,7 @@ const TaskList: React.FC<TaskListProps> = ({}) => {
 
   return (
     <Box mb={4}>
-      <List spacing={3}>
+      <List.Root gap={3}>
         {tasks.map((task, index) => {
           const visible =
             timerState !== "active" || task.id === selectedTask?.id;
@@ -30,31 +30,29 @@ const TaskList: React.FC<TaskListProps> = ({}) => {
                 zIndex={tasks.length}
                 key={`task-${task.id}`}
               >
-                <ListItem>
-                  <TaskCard task={task} />
-                </ListItem>
+                <TaskCard task={task} />
               </Box>
             );
           }
 
           return (
-            <Collapse
-              in={visible}
+            <Collapsible.Root
+              open={visible}
               key={`task-${task.id}`}
               style={{
-                overflow: "", // Prevent inner component to be cut off
+                overflow: "visible", // Prevent inner component to be cut off
                 zIndex: index,
                 position: "relative",
                 background: "transparent",
               }}
             >
-              <ListItem>
+              <Collapsible.Content>
                 <TaskCard task={task} />
-              </ListItem>
-            </Collapse>
+              </Collapsible.Content>
+            </Collapsible.Root>
           );
         })}
-      </List>
+      </List.Root>
     </Box>
   );
 };

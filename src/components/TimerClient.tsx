@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Box, Container, useToast } from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 import TaskList from "../components/TaskList";
-import AlertDialogComponent from "../components/AlertDialogComponent";
 import TopBar from "../components/TopBar";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
@@ -11,9 +10,9 @@ import { MINUTES_25 } from "@/constants";
 import { calculateElapsedTime, formatTimeByDate } from "@/utils";
 import { useSearchParams } from "next/navigation";
 import CurrentTimer from "@/components/CurrentTimer";
+import { toaster } from "./ui/toaster";
 
 const TimerClient: React.FC = () => {
-  const toast = useToast();
   const searchParams = useSearchParams();
   const {
     state: { timerState },
@@ -26,10 +25,6 @@ const TimerClient: React.FC = () => {
     saveInProgressTaskAsync,
     removeInProgressTaskAsync,
   } = useTask();
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-
-  const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const embed = searchParams.get("embed");
   const taskId = searchParams.get("taskId");
@@ -48,15 +43,6 @@ const TimerClient: React.FC = () => {
       timerDispatch({ type: "START_TIMER" });
     }
   }, [inProgressTask]);
-
-  const onCloseAlert = () => {
-    setIsAlertOpen(false);
-  };
-
-  const onContinue = () => {
-    setIsAlertOpen(false);
-    timerDispatch({ type: "START_TIMER" });
-  };
 
   const handleTimerStart = async () => {
     await saveInProgressTaskAsync(selectedTask!.id);
@@ -82,7 +68,7 @@ const TimerClient: React.FC = () => {
     taskDispatch({
       type: "SET_TASKS",
       payload: tasks.map((task) =>
-        task.id === selectedTask.id ? newSelectedTask : task
+        task.id === selectedTask.id ? newSelectedTask : task,
       ),
     });
 
@@ -94,11 +80,11 @@ const TimerClient: React.FC = () => {
     } catch (error) {
       console.error(error);
 
-      toast({
+      toaster.create({
         duration: 5000,
-        isClosable: true,
+        closable: true,
         title: "Error",
-        status: "error",
+        type: "error",
         description: "An error occurred while saving the task",
       });
     }
@@ -127,7 +113,7 @@ const TimerClient: React.FC = () => {
     taskDispatch({
       type: "SET_TASKS",
       payload: tasks.map((task) =>
-        task.id === selectedTask.id ? newSelectedTask : task
+        task.id === selectedTask.id ? newSelectedTask : task,
       ),
     });
 
@@ -139,11 +125,11 @@ const TimerClient: React.FC = () => {
     } catch (error) {
       console.error(error);
 
-      toast({
+      toaster.create({
         duration: 5000,
-        isClosable: true,
+        closable: true,
         title: "Error",
-        status: "error",
+        type: "error",
         description: "An error occurred while saving the task",
       });
     }
@@ -151,11 +137,10 @@ const TimerClient: React.FC = () => {
 
   return (
     <Container
-      ref={containerRef}
-      py={embed ? 0 : 4}
       gap={8}
+      maxW="4xl"
       display="flex"
-      maxWidth="container.md"
+      py={embed ? 0 : 4}
       flexDirection={{ base: "column", sm: "row" }}
     >
       <CurrentTimer
@@ -170,12 +155,6 @@ const TimerClient: React.FC = () => {
           <TaskList />
         </Box>
       )}
-      <AlertDialogComponent
-        isOpen={isAlertOpen}
-        cancelRef={cancelRef}
-        onClose={onCloseAlert}
-        onContinue={onContinue}
-      />
     </Container>
   );
 };

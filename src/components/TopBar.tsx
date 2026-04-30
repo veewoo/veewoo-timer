@@ -1,18 +1,12 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import {
   Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
   useDisclosure,
   Button,
+  CloseButton,
   IconButton,
   Switch,
-  FormControl,
-  FormLabel,
+  Field,
   Flex,
   Text,
   Stack,
@@ -26,8 +20,7 @@ import WakeLockButton from "./WakeLockButton";
 import ContinueTimerButton from "./ContinueTimerButton";
 
 const PageHeader: React.FC = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const { open, onOpen, onClose } = useDisclosure();
   const { state, dispatch } = useSettings();
 
   return (
@@ -39,40 +32,62 @@ const PageHeader: React.FC = () => {
         <RefreshTaskButton />
         <WakeLockButton />
         <ContinueTimerButton />
+        <IconButton size="sm" aria-label="Settings" onClick={onOpen}>
+          <FaCog />
+        </IconButton>
       </Stack>
-      <Drawer
-        isOpen={isOpen}
-        placement="right"
-        onClose={onClose}
-        finalFocusRef={btnRef}
+      <Drawer.Root
+        open={open}
+        placement="end"
+        onOpenChange={(details) => {
+          if (details.open) onOpen();
+          else onClose();
+        }}
       >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Settings</DrawerHeader>
-          <DrawerBody>
-            <WakeLockSwitch />
-            <FormControl display="flex" alignItems="center" mt={4}>
-              <FormLabel htmlFor="continue-timer-on-end" mb="0">
-                Continue Timer on End
-              </FormLabel>
-              <Switch
-                id="continue-timer-on-end"
-                isChecked={state.continueTimerOnEnd}
-                onChange={() =>
-                  dispatch({ type: "TOGGLE_CONTINUE_TIMER_ON_END" })
-                }
-              />
-            </FormControl>
-          </DrawerBody>
+        <Drawer.Backdrop />
+        <Drawer.Positioner>
+          <Drawer.Content>
+            <Drawer.CloseTrigger asChild>
+              <CloseButton size="sm" />
+            </Drawer.CloseTrigger>
+            <Drawer.Header>
+              <Drawer.Title>Settings</Drawer.Title>
+            </Drawer.Header>
+            <Drawer.Body>
+              <WakeLockSwitch />
+              <Field.Root
+                orientation="horizontal"
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                mt={4}
+              >
+                <Field.Label htmlFor="continue-timer-on-end" mb="0">
+                  Continue Timer on End
+                </Field.Label>
+                <Switch.Root
+                  id="continue-timer-on-end"
+                  checked={state.continueTimerOnEnd}
+                  onCheckedChange={() =>
+                    dispatch({ type: "TOGGLE_CONTINUE_TIMER_ON_END" })
+                  }
+                >
+                  <Switch.HiddenInput />
+                  <Switch.Control>
+                    <Switch.Thumb />
+                  </Switch.Control>
+                </Switch.Root>
+              </Field.Root>
+            </Drawer.Body>
 
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+            <Drawer.Footer>
+              <Button variant="outline" mr={3} onClick={onClose}>
+                Close
+              </Button>
+            </Drawer.Footer>
+          </Drawer.Content>
+        </Drawer.Positioner>
+      </Drawer.Root>
     </Flex>
   );
 };
@@ -101,7 +116,7 @@ const RefreshTaskButton: React.FC = () => {
     <IconButton
       size="sm"
       aria-label="Sync"
-      isLoading={isLoading}
+      loading={isLoading}
       onClick={handleRefresh}
     >
       <FaSync />

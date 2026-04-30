@@ -3,7 +3,8 @@
 import { SettingsProvider } from "@/context/SettingsContext";
 import { TaskProvider } from "@/context/TaskContext";
 import { TimerProvider } from "@/context/TimerStateContext";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Toaster } from "@/components/ui/toaster";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -20,7 +21,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <SettingsProvider>
         <TaskProvider>
           <TimerProvider>
-            <ChakraProvider>{children}</ChakraProvider>
+            <ChakraProvider value={defaultSystem}>
+              {children}
+              <Toaster />
+            </ChakraProvider>
           </TimerProvider>
         </TaskProvider>
       </SettingsProvider>
