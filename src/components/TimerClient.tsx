@@ -141,6 +141,7 @@ const TimerClient: React.FC = () => {
       maxW="4xl"
       display="flex"
       py={embed ? 0 : 4}
+      px={embed ? 0 : undefined}
       flexDirection={{ base: "column", sm: "row" }}
     >
       <CurrentTimer

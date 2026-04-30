@@ -124,19 +124,27 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
           </ProgressCircle.Root>
         )}
         {variant === "embed" && (
-          <Text fontSize="xl" fontWeight="bold" color="teal.500">
+          <Text fontSize="xl" fontWeight="bold">
             {formatTime(remainingTime)}
           </Text>
         )}
         <Stack direction="row" gap={2} justify="center">
           {(timerState === "paused" || timerState == "stopped") && (
-            <Button size="sm" onClick={startTimer} disabled={!selectedTask}>
+            <Button
+              size={variant === "embed" ? "xs" : "sm"}
+              onClick={startTimer}
+              disabled={!selectedTask}
+            >
               <FaPlay />
               Start
             </Button>
           )}
           {timerState === "active" && (
-            <Button size="sm" colorPalette="yellow" onClick={pauseTimer}>
+            <Button
+              size={variant === "embed" ? "xs" : "sm"}
+              colorPalette="yellow"
+              onClick={pauseTimer}
+            >
               <FaPause />
               Pause
             </Button>
