@@ -97,7 +97,7 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
   };
 
   return (
-    <Box mb={4} textAlign="center">
+    <Box textAlign="center">
       <Stack
         direction={variant === "default" ? "column" : "row"}
         alignItems="center"
