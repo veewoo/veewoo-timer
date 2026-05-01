@@ -5,23 +5,18 @@ import {
   Button,
   CloseButton,
   IconButton,
-  Switch,
-  Field,
   Flex,
   Text,
   Stack,
 } from "@chakra-ui/react";
 import { FaCog, FaSync } from "react-icons/fa";
-import { useSettings } from "../context/SettingsContext";
 import WakeLockSwitch from "./WakeLockSwitch";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
 import WakeLockButton from "./WakeLockButton";
-import ContinueTimerButton from "./ContinueTimerButton";
 
 const PageHeader: React.FC = () => {
   const { open, onOpen, onClose } = useDisclosure();
-  const { state, dispatch } = useSettings();
 
   return (
     <Flex justifyContent="space-between" alignItems="center" mb={6} border="">
@@ -31,7 +26,6 @@ const PageHeader: React.FC = () => {
       <Stack direction="row" gap={2}>
         <RefreshTaskButton />
         <WakeLockButton />
-        <ContinueTimerButton />
         <IconButton size="sm" aria-label="Settings" onClick={onOpen}>
           <FaCog />
         </IconButton>
@@ -55,29 +49,6 @@ const PageHeader: React.FC = () => {
             </Drawer.Header>
             <Drawer.Body>
               <WakeLockSwitch />
-              <Field.Root
-                orientation="horizontal"
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-                mt={4}
-              >
-                <Field.Label htmlFor="continue-timer-on-end" mb="0">
-                  Continue Timer on End
-                </Field.Label>
-                <Switch.Root
-                  id="continue-timer-on-end"
-                  checked={state.continueTimerOnEnd}
-                  onCheckedChange={() =>
-                    dispatch({ type: "TOGGLE_CONTINUE_TIMER_ON_END" })
-                  }
-                >
-                  <Switch.HiddenInput />
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                </Switch.Root>
-              </Field.Root>
             </Drawer.Body>
 
             <Drawer.Footer>

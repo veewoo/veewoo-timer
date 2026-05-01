@@ -14,7 +14,6 @@ import { FaPlay, FaPause } from "react-icons/fa";
 import { useTask } from "@/context/TaskContext";
 import { calculateElapsedTime, formatTime } from "@/utils";
 import { MINUTES_25 } from "@/constants";
-import { useSettings } from "@/context/SettingsContext";
 
 interface CurrentTimerProps {
   variant: "default" | "embed";
@@ -38,10 +37,6 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
     state: { inProgressTask, selectedTask },
   } = useTask();
 
-  const {
-    state: { continueTimerOnEnd },
-  } = useSettings();
-
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -53,11 +48,7 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
         const secondsCountedInCurrentCycle = secondsCounted % MINUTES_25;
         let newRemainingTime = MINUTES_25 - secondsCountedInCurrentCycle;
 
-        if (
-          secondsCountedInCurrentCycle === 0 &&
-          secondsCounted !== 0 &&
-          !continueTimerOnEnd
-        ) {
+        if (secondsCountedInCurrentCycle === 0 && secondsCounted !== 0) {
           newRemainingTime = MINUTES_25;
           dispatch({ type: "STOP_TIMER" });
           onTimerStop();
