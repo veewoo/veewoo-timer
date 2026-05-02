@@ -39,10 +39,30 @@ const TimerClient: React.FC = () => {
   }, [tasks, taskId]);
 
   useEffect(() => {
-    if (inProgressTask && selectedTask && timerState !== "active") {
-      timerDispatch({ type: "START_TIMER" });
+    if (!selectedTask) return;
+    if (inProgressTask) {
+      timerDispatch({
+        type: "SET_REMAINING_TIME",
+        payload: selectedTask.remainingTime,
+      });
+      if (timerState !== "active") {
+        timerDispatch({ type: "START_TIMER" });
+      }
+      return;
     }
-  }, [inProgressTask]);
+    if (timerState !== "active") {
+      timerDispatch({
+        type: "SET_REMAINING_TIME",
+        payload: selectedTask.remainingTime,
+      });
+    }
+  }, [
+    inProgressTask,
+    selectedTask?.id,
+    selectedTask?.remainingTime,
+    timerState,
+    timerDispatch,
+  ]);
 
   const handleTimerStart = async () => {
     await saveInProgressTaskAsync(selectedTask!.id);
