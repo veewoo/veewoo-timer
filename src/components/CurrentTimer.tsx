@@ -14,20 +14,19 @@ import { FaPlay, FaPause } from "react-icons/fa";
 import { useTask } from "@/context/TaskContext";
 import { calculateElapsedTime, formatTime } from "@/utils";
 import { MINUTES_25 } from "@/constants";
-import { useSettings } from "@/context/SettingsContext";
 
 interface CurrentTimerProps {
   variant: "default" | "embed";
   onTimerStart: () => void;
   onTimerPause: (remainingTime: number) => void;
-  onTimerStop: () => void;
+  onTimerFinish: () => void;
 }
 
 const CurrentTimer: React.FC<CurrentTimerProps> = ({
   variant,
   onTimerStart,
   onTimerPause,
-  onTimerStop,
+  onTimerFinish,
 }) => {
   const {
     state: { timerState, remainingTime },
@@ -38,35 +37,22 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
     state: { inProgressTask, selectedTask },
   } = useTask();
 
-  const {
-    state: { continueTimerOnEnd },
-  } = useSettings();
-
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (timerState === "active") {
+    if (inProgressTask && timerState === "active") {
       intervalRef.current = setInterval(() => {
-        const newElapsedTime = calculateElapsedTime(inProgressTask?.startTime);
-        const secondsCounted =
-          (selectedTask?.secondsCounted || 0) + newElapsedTime;
-        const secondsCountedInCurrentCycle = secondsCounted % MINUTES_25;
-        let newRemainingTime = MINUTES_25 - secondsCountedInCurrentCycle;
-
-        if (
-          secondsCountedInCurrentCycle === 0 &&
-          secondsCounted !== 0 &&
-          !continueTimerOnEnd
-        ) {
-          newRemainingTime = MINUTES_25;
+        const newElapsedTime = calculateElapsedTime(inProgressTask.startTime);
+        if (newElapsedTime >= remainingTime) {
+          dispatch({ type: "SET_REMAINING_TIME", payload: MINUTES_25 });
           dispatch({ type: "STOP_TIMER" });
-          onTimerStop();
+          onTimerFinish();
+        } else {
+          dispatch({
+            type: "SET_REMAINING_TIME",
+            payload: remainingTime - newElapsedTime,
+          });
         }
-
-        dispatch({
-          type: "SET_REMAINING_TIME",
-          payload: newRemainingTime,
-        });
       }, 1000);
     } else {
       clearTimerInterval();
@@ -89,11 +75,6 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
   const pauseTimer = async () => {
     dispatch({ type: "PAUSE_TIMER" });
     onTimerPause(remainingTime);
-  };
-
-  const stopTimer = async () => {
-    dispatch({ type: "STOP_TIMER" });
-    onTimerStop();
   };
 
   return (

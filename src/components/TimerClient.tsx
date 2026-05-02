@@ -90,17 +90,15 @@ const TimerClient: React.FC = () => {
     }
   };
 
-  const handleTimerStop = async () => {
+  const handleTimerFinish = async () => {
     if (!selectedTask) return;
 
-    let newElapsedTime = 0;
-    if (inProgressTask) {
-      newElapsedTime = calculateElapsedTime(inProgressTask.startTime);
-    }
+    const remainingInCycle =
+      MINUTES_25 - (selectedTask.secondsCounted % MINUTES_25);
 
     const newSelectedTask = {
       ...selectedTask,
-      secondsCounted: selectedTask.secondsCounted + newElapsedTime,
+      secondsCounted: selectedTask.secondsCounted + remainingInCycle,
       remainingTime: MINUTES_25,
       lastModified: formatTimeByDate(),
     };
@@ -146,9 +144,9 @@ const TimerClient: React.FC = () => {
     >
       <CurrentTimer
         variant={embed ? "embed" : "default"}
-        onTimerStop={handleTimerStop}
         onTimerStart={handleTimerStart}
         onTimerPause={handleTimerPause}
+        onTimerFinish={handleTimerFinish}
       />
       {!embed && (
         <Box flexGrow={1}>
