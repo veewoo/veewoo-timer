@@ -21,8 +21,6 @@ import {
   ReactNode,
   Dispatch,
 } from "react";
-import { calculateElapsedTime } from "@/utils";
-import { MINUTES_25 } from "@/constants";
 import { toaster } from "@/components/ui/toaster";
 
 interface TaskState {
@@ -102,10 +100,10 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
           });
         }
       },
-    }
+    },
   );
 
-  const { isFetching: isFetchingInProgressTasks, refetch: refetchInProgressTasks } = useQuery(
+  const { isFetching: isFetchingInProgressTasks } = useQuery(
     ["tasks-in-progress", state.tasks.length],
     fetchInProgressTasks,
     {
@@ -121,7 +119,7 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
           inProgressTask.id = Number(inProgressTask.id);
 
           const newSelectedTask = state.tasks.find(
-            (task) => task.id === inProgressTask.id
+            (task) => task.id === inProgressTask.id,
           );
 
           if (!newSelectedTask) {
@@ -130,40 +128,16 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
               closable: true,
               title: "Error",
               type: "error",
-              description: "Selected task not found"
+              description: "Selected task not found",
             });
             return;
           }
 
-          const newElapsedTime = calculateElapsedTime(inProgressTask.startTime);
-
-          if (newElapsedTime > newSelectedTask.remainingTime) {
-            newSelectedTask.secondsCounted += newElapsedTime;
-            newSelectedTask.remainingTime =
-              MINUTES_25 - (newSelectedTask.secondsCounted % MINUTES_25);
-
-            dispatch({
-              type: "SET_TASKS",
-              payload: state.tasks.map((task) =>
-                task.id === newSelectedTask.id ? newSelectedTask : task
-              ),
-            });
-
-            dispatch({
-              type: "SET_SELECTED_TASK",
-              payload: newSelectedTask,
-            });
-          } else {
-            dispatch({
-              type: "SET_SELECTED_TASK",
-              payload: state.tasks.find((task) => task.id === inProgressTask.id),
-            });
-          }
-
+          dispatch({ type: "SET_SELECTED_TASK", payload: newSelectedTask });
           dispatch({ type: "SET_IN_PROGRESS_TASK", payload: inProgressTask });
         }
       },
-    }
+    },
   );
 
   const saveTaskMutation = useMutation(saveTaskToServer);
