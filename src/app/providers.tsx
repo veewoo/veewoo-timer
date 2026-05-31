@@ -1,6 +1,5 @@
 "use client";
 
-import { SettingsProvider } from "@/context/SettingsContext";
 import { TaskProvider } from "@/context/TaskContext";
 import { TimerProvider } from "@/context/TimerStateContext";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,16 +17,14 @@ const queryClient = new QueryClient({
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <TaskProvider>
-          <TimerProvider>
-            <ChakraProvider value={defaultSystem}>
-              {children}
-              <Toaster />
-            </ChakraProvider>
-          </TimerProvider>
-        </TaskProvider>
-      </SettingsProvider>
+      <TaskProvider>
+        <TimerProvider>
+          <ChakraProvider value={defaultSystem}>
+            {children}
+            <Toaster />
+          </ChakraProvider>
+        </TimerProvider>
+      </TaskProvider>
     </QueryClientProvider>
   );
 }
