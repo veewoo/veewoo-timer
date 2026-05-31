@@ -1,18 +1,23 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Box, Container } from "@chakra-ui/react";
 import TaskList from "../components/TaskList";
 import TopBar from "../components/TopBar";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
 import { MINUTES_25 } from "@/constants";
-import { calculateElapsedTime, formatTimeByDate } from "@/utils";
+import {
+  calculateElapsedTime,
+  formatTimeByDate,
+  requestWakeLockForPhone,
+} from "@/utils";
 import { useSearchParams } from "next/navigation";
 import CurrentTimer from "@/components/CurrentTimer";
 import { toaster } from "./ui/toaster";
 
 const TimerClient: React.FC = () => {
+  const wakeLockSentinelRef = useRef<WakeLockSentinel | null>(null);
   const searchParams = useSearchParams();
   const {
     state: { timerState },
@@ -29,43 +34,15 @@ const TimerClient: React.FC = () => {
   const embed = searchParams.get("embed");
   const taskId = searchParams.get("taskId");
 
-  useEffect(() => {
-    if (taskId) {
-      const task = tasks.find((task) => task.id === Number(taskId));
-      if (task) {
-        taskDispatch({ type: "SET_SELECTED_TASK", payload: task });
-      }
+  const requestWakeLock = async () => {
+    if (!wakeLockSentinelRef.current || wakeLockSentinelRef.current.released) {
+      wakeLockSentinelRef.current = await requestWakeLockForPhone();
     }
-  }, [tasks, taskId]);
-
-  useEffect(() => {
-    if (!selectedTask) return;
-    if (inProgressTask) {
-      timerDispatch({
-        type: "SET_REMAINING_TIME",
-        payload: selectedTask.remainingTime,
-      });
-      if (timerState !== "active") {
-        timerDispatch({ type: "START_TIMER" });
-      }
-      return;
-    }
-    if (timerState !== "active") {
-      timerDispatch({
-        type: "SET_REMAINING_TIME",
-        payload: selectedTask.remainingTime,
-      });
-    }
-  }, [
-    inProgressTask,
-    selectedTask?.id,
-    selectedTask?.remainingTime,
-    timerState,
-    timerDispatch,
-  ]);
+  };
 
   const handleTimerStart = async () => {
     await saveInProgressTaskAsync(selectedTask!.id);
+    await requestWakeLock();
   };
 
   const handleTimerPause = async (remaining: number) => {
@@ -152,6 +129,42 @@ const TimerClient: React.FC = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (taskId) {
+      const task = tasks.find((task) => task.id === Number(taskId));
+      if (task) {
+        taskDispatch({ type: "SET_SELECTED_TASK", payload: task });
+      }
+    }
+  }, [tasks, taskId]);
+
+  useEffect(() => {
+    if (!selectedTask) return;
+    if (inProgressTask) {
+      timerDispatch({
+        type: "SET_REMAINING_TIME",
+        payload: selectedTask.remainingTime,
+      });
+      if (timerState !== "active") {
+        timerDispatch({ type: "START_TIMER" });
+      }
+      requestWakeLock();
+      return;
+    }
+    if (timerState !== "active") {
+      timerDispatch({
+        type: "SET_REMAINING_TIME",
+        payload: selectedTask.remainingTime,
+      });
+    }
+  }, [
+    inProgressTask,
+    selectedTask?.id,
+    selectedTask?.remainingTime,
+    timerState,
+    timerDispatch,
+  ]);
 
   return (
     <Container
