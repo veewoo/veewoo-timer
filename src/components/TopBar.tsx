@@ -1,22 +1,10 @@
 import React from "react";
-import {
-  Drawer,
-  useDisclosure,
-  Button,
-  CloseButton,
-  IconButton,
-  Flex,
-  Text,
-  Stack,
-} from "@chakra-ui/react";
-import { FaCog, FaSync } from "react-icons/fa";
-import WakeLockSwitch from "./WakeLockSwitch";
+import { IconButton, Flex, Text, Stack } from "@chakra-ui/react";
+import { FaSync } from "react-icons/fa";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
 
 const PageHeader: React.FC = () => {
-  const { open, onOpen, onClose } = useDisclosure();
-
   return (
     <Flex justifyContent="space-between" alignItems="center" mb={6} border="">
       <Text fontSize="large" fontWeight="bold">
@@ -24,39 +12,7 @@ const PageHeader: React.FC = () => {
       </Text>
       <Stack direction="row" gap={2}>
         <RefreshTaskButton />
-        <IconButton size="sm" aria-label="Settings" onClick={onOpen}>
-          <FaCog />
-        </IconButton>
       </Stack>
-      <Drawer.Root
-        open={open}
-        placement="end"
-        onOpenChange={(details) => {
-          if (details.open) onOpen();
-          else onClose();
-        }}
-      >
-        <Drawer.Backdrop />
-        <Drawer.Positioner>
-          <Drawer.Content>
-            <Drawer.CloseTrigger asChild>
-              <CloseButton size="sm" />
-            </Drawer.CloseTrigger>
-            <Drawer.Header>
-              <Drawer.Title>Settings</Drawer.Title>
-            </Drawer.Header>
-            <Drawer.Body>
-              <WakeLockSwitch />
-            </Drawer.Body>
-
-            <Drawer.Footer>
-              <Button variant="outline" mr={3} onClick={onClose}>
-                Close
-              </Button>
-            </Drawer.Footer>
-          </Drawer.Content>
-        </Drawer.Positioner>
-      </Drawer.Root>
     </Flex>
   );
 };

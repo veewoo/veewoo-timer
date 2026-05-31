@@ -33,6 +33,22 @@ export function calculateRemainingTimer(
   return MINUTES_25 - (elapsedTime % MINUTES_25);
 }
 
+export async function requestWakeLockForPhone() {
+  if (!isPhoneDevice() || !("wakeLock" in navigator)) return null;
+
+  try {
+    console.log("Requesting Wake Lock");
+    return await navigator.wakeLock.request("screen");
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(`${err.name}, ${err.message}`);
+    } else {
+      console.error("An unknown error occurred");
+    }
+    return null;
+  }
+}
+
 function isPhoneDevice() {
   if (typeof window === "undefined") return false;
 
@@ -40,19 +56,4 @@ function isPhoneDevice() {
   const hasPhoneViewport = window.matchMedia("(max-width: 767px)").matches;
 
   return hasCoarsePointer && hasPhoneViewport;
-}
-
-export async function requestWakeLockForPhone() {
-  if (!isPhoneDevice() || !("wakeLock" in navigator)) return;
-
-  try {
-    await navigator.wakeLock.request("screen");
-    console.log("Wake Lock is active");
-  } catch (err) {
-    if (err instanceof Error) {
-      console.error(`${err.name}, ${err.message}`);
-    } else {
-      console.error("An unknown error occurred");
-    }
-  }
 }
