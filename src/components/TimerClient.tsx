@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { Box, Container } from "@chakra-ui/react";
 import TaskList from "../components/TaskList";
 import TopBar from "../components/TopBar";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
 import { MINUTES_25 } from "@/constants";
-import { calculateElapsedTime, formatTimeByDate } from "@/utils";
+import {
+  calculateElapsedTime,
+  formatTimeByDate,
+  requestWakeLockForPhone,
+} from "@/utils";
 import { useSearchParams } from "next/navigation";
 import CurrentTimer from "@/components/CurrentTimer";
 import { toaster } from "./ui/toaster";
@@ -48,6 +52,7 @@ const TimerClient: React.FC = () => {
       if (timerState !== "active") {
         timerDispatch({ type: "START_TIMER" });
       }
+      requestWakeLockForPhone();
       return;
     }
     if (timerState !== "active") {
@@ -66,6 +71,7 @@ const TimerClient: React.FC = () => {
 
   const handleTimerStart = async () => {
     await saveInProgressTaskAsync(selectedTask!.id);
+    await requestWakeLockForPhone();
   };
 
   const handleTimerPause = async (remaining: number) => {

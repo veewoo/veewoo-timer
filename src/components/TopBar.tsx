@@ -13,7 +13,6 @@ import { FaCog, FaSync } from "react-icons/fa";
 import WakeLockSwitch from "./WakeLockSwitch";
 import { useTask } from "@/context/TaskContext";
 import { useTimer } from "@/context/TimerStateContext";
-import WakeLockButton from "./WakeLockButton";
 
 const PageHeader: React.FC = () => {
   const { open, onOpen, onClose } = useDisclosure();
@@ -25,7 +24,6 @@ const PageHeader: React.FC = () => {
       </Text>
       <Stack direction="row" gap={2}>
         <RefreshTaskButton />
-        <WakeLockButton />
         <IconButton size="sm" aria-label="Settings" onClick={onOpen}>
           <FaCog />
         </IconButton>
