@@ -1,6 +1,5 @@
 "use client";
 
-import { useTimer } from "@/context/TimerStateContext";
 import {
   Box,
   Button,
@@ -11,12 +10,20 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
-import { useTask } from "@/context/TaskContext";
 import { calculateElapsedTime, formatTime } from "@/utils";
 import { MINUTES_25 } from "@/constants";
+import { InProgressTask, Task, TimerState } from "@/types";
 
 interface CurrentTimerProps {
   variant: "default" | "embed";
+  timerState: TimerState;
+  remainingTime: number;
+  setRemainingTime: (value: number) => void;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  stopTimer: () => void;
+  inProgressTask: InProgressTask | null;
+  selectedTask: Task | null;
   onTimerStart: () => void;
   onTimerPause: (remainingTime: number) => void;
   onTimerFinish: () => void;
@@ -24,19 +31,18 @@ interface CurrentTimerProps {
 
 const CurrentTimer: React.FC<CurrentTimerProps> = ({
   variant,
+  timerState,
+  remainingTime,
+  setRemainingTime,
+  startTimer,
+  pauseTimer,
+  stopTimer,
+  inProgressTask,
+  selectedTask,
   onTimerStart,
   onTimerPause,
   onTimerFinish,
 }) => {
-  const {
-    state: { timerState, remainingTime },
-    dispatch,
-  } = useTimer();
-
-  const {
-    state: { inProgressTask, selectedTask },
-  } = useTask();
-
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -44,14 +50,10 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
       intervalRef.current = setInterval(() => {
         const newElapsedTime = calculateElapsedTime(inProgressTask.startTime);
         if (newElapsedTime >= remainingTime) {
-          dispatch({ type: "SET_REMAINING_TIME", payload: MINUTES_25 });
-          dispatch({ type: "STOP_TIMER" });
+          stopTimer();
           onTimerFinish();
         } else {
-          dispatch({
-            type: "SET_REMAINING_TIME",
-            payload: remainingTime - newElapsedTime,
-          });
+          setRemainingTime(remainingTime - newElapsedTime);
         }
       }, 1000);
     } else {
@@ -67,13 +69,13 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
     if (intervalRef.current) clearInterval(intervalRef.current);
   }
 
-  const startTimer = async () => {
-    dispatch({ type: "START_TIMER" });
+  const handleStart = async () => {
+    startTimer();
     onTimerStart();
   };
 
-  const pauseTimer = async () => {
-    dispatch({ type: "PAUSE_TIMER" });
+  const handlePause = async () => {
+    pauseTimer();
     onTimerPause(remainingTime);
   };
 
@@ -113,7 +115,7 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
           {(timerState === "paused" || timerState == "stopped") && (
             <Button
               size={variant === "embed" ? "xs" : "sm"}
-              onClick={startTimer}
+              onClick={handleStart}
               disabled={!selectedTask}
             >
               <FaPlay />
@@ -124,7 +126,7 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
             <Button
               size={variant === "embed" ? "xs" : "sm"}
               colorPalette="yellow"
-              onClick={pauseTimer}
+              onClick={handlePause}
             >
               <FaPause />
               Pause

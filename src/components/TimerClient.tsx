@@ -4,8 +4,8 @@ import { useRef, useEffect } from "react";
 import { Box, Container } from "@chakra-ui/react";
 import TaskList from "../components/TaskList";
 import TopBar from "../components/TopBar";
-import { useTask } from "@/context/TaskContext";
-import { useTimer } from "@/context/TimerStateContext";
+import { useTaskState } from "@/hooks/useTaskState";
+import { useTimerState } from "@/hooks/useTimerState";
 import { MINUTES_25 } from "@/constants";
 import {
   calculateElapsedTime,
@@ -15,21 +15,32 @@ import {
 import { useSearchParams } from "next/navigation";
 import CurrentTimer from "@/components/CurrentTimer";
 import { toaster } from "./ui/toaster";
+import { Task } from "@/types";
 
 const TimerClient: React.FC = () => {
   const wakeLockSentinelRef = useRef<WakeLockSentinel | null>(null);
   const searchParams = useSearchParams();
   const {
-    state: { timerState },
-    dispatch: timerDispatch,
-  } = useTimer();
+    timerState,
+    remainingTime,
+    startTimer,
+    pauseTimer,
+    stopTimer,
+    setRemainingTime,
+  } = useTimerState();
   const {
-    state: { selectedTask, inProgressTask, tasks },
-    dispatch: taskDispatch,
+    selectedTask,
+    inProgressTask,
+    tasks,
+    setTasks,
+    setSelectedTask,
+    setInProgressTask,
     saveTaskAsync,
     saveInProgressTaskAsync,
     removeInProgressTaskAsync,
-  } = useTask();
+    isLoading,
+    refetchTasksAsync,
+  } = useTaskState();
 
   const embed = searchParams.get("embed");
   const taskId = searchParams.get("taskId");
@@ -57,17 +68,13 @@ const TimerClient: React.FC = () => {
       lastModified: formatTimeByDate(),
     };
 
-    taskDispatch({
-      type: "SET_SELECTED_TASK",
-      payload: newSelectedTask,
-    });
+    setSelectedTask(newSelectedTask);
 
-    taskDispatch({
-      type: "SET_TASKS",
-      payload: tasks.map((task) =>
+    setTasks(
+      tasks.map((task) =>
         task.id === selectedTask.id ? newSelectedTask : task,
       ),
-    });
+    );
 
     try {
       await Promise.all([
@@ -100,17 +107,13 @@ const TimerClient: React.FC = () => {
       lastModified: formatTimeByDate(),
     };
 
-    taskDispatch({
-      type: "SET_SELECTED_TASK",
-      payload: newSelectedTask,
-    });
+    setSelectedTask(newSelectedTask);
 
-    taskDispatch({
-      type: "SET_TASKS",
-      payload: tasks.map((task) =>
+    setTasks(
+      tasks.map((task) =>
         task.id === selectedTask.id ? newSelectedTask : task,
       ),
-    });
+    );
 
     try {
       await Promise.all([
@@ -130,11 +133,56 @@ const TimerClient: React.FC = () => {
     }
   };
 
+  const handleSelectTask = (task: Task) => {
+    if (timerState !== "active") {
+      setSelectedTask(task);
+      setRemainingTime(task.remainingTime);
+    }
+  };
+
+  const handleResetTask = async (task: Task) => {
+    try {
+      const isSelected = selectedTask?.id === task.id;
+
+      if (isSelected) {
+        stopTimer();
+      }
+
+      const resetTask: Task = {
+        ...task,
+        secondsCounted: 0,
+        remainingTime: MINUTES_25,
+        startTime: null,
+        pauseTime: null,
+        stopTime: null,
+      };
+
+      await saveTaskAsync(resetTask);
+
+      if (isSelected) {
+        setSelectedTask(resetTask);
+      }
+
+      setTasks(tasks.map((t) => (t.id === task.id ? resetTask : t)));
+
+      setInProgressTask(null);
+    } catch (error) {
+      console.error(error);
+      toaster.create({
+        title: "Error",
+        description: "An error occurred while resetting the task.",
+        type: "error",
+        duration: 5000,
+        closable: true,
+      });
+    }
+  };
+
   useEffect(() => {
     if (taskId) {
       const task = tasks.find((task) => task.id === Number(taskId));
       if (task) {
-        taskDispatch({ type: "SET_SELECTED_TASK", payload: task });
+        setSelectedTask(task);
       }
     }
   }, [tasks, taskId]);
@@ -142,28 +190,23 @@ const TimerClient: React.FC = () => {
   useEffect(() => {
     if (!selectedTask) return;
     if (inProgressTask) {
-      timerDispatch({
-        type: "SET_REMAINING_TIME",
-        payload: selectedTask.remainingTime,
-      });
+      setRemainingTime(selectedTask.remainingTime);
       if (timerState !== "active") {
-        timerDispatch({ type: "START_TIMER" });
+        startTimer();
       }
       requestWakeLock();
       return;
     }
     if (timerState !== "active") {
-      timerDispatch({
-        type: "SET_REMAINING_TIME",
-        payload: selectedTask.remainingTime,
-      });
+      setRemainingTime(selectedTask.remainingTime);
     }
   }, [
     inProgressTask,
     selectedTask?.id,
     selectedTask?.remainingTime,
     timerState,
-    timerDispatch,
+    setRemainingTime,
+    startTimer,
   ]);
 
   return (
@@ -177,14 +220,35 @@ const TimerClient: React.FC = () => {
     >
       <CurrentTimer
         variant={embed ? "embed" : "default"}
+        timerState={timerState}
+        remainingTime={remainingTime}
+        startTimer={startTimer}
+        pauseTimer={pauseTimer}
+        stopTimer={stopTimer}
+        setRemainingTime={setRemainingTime}
+        inProgressTask={inProgressTask}
+        selectedTask={selectedTask}
         onTimerStart={handleTimerStart}
         onTimerPause={handleTimerPause}
         onTimerFinish={handleTimerFinish}
       />
       {!embed && (
         <Box flexGrow={1}>
-          <TopBar />
-          <TaskList />
+          <TopBar
+            isLoading={isLoading}
+            selectedTask={selectedTask}
+            setRemainingTime={setRemainingTime}
+            refetchTasksAsync={refetchTasksAsync}
+          />
+          <TaskList
+            tasks={tasks}
+            timerState={timerState}
+            isLoading={isLoading}
+            selectedTask={selectedTask}
+            inProgressTask={inProgressTask}
+            onSelectTask={handleSelectTask}
+            onResetTask={handleResetTask}
+          />
         </Box>
       )}
     </Container>

@@ -1,18 +1,26 @@
 import { Box, Collapsible, List } from "@chakra-ui/react";
 import TaskCard from "./TaskCard";
-import { useTimer } from "@/context/TimerStateContext";
-import { useTask } from "@/context/TaskContext";
+import { InProgressTask, Task, TimerState } from "@/types";
 
-type TaskListProps = {};
+interface TaskListProps {
+  tasks: Task[];
+  timerState: TimerState;
+  isLoading: boolean;
+  selectedTask: Task | null;
+  inProgressTask: InProgressTask | null;
+  onSelectTask: (task: Task) => void;
+  onResetTask: (task: Task) => void;
+}
 
-const TaskList: React.FC<TaskListProps> = ({}) => {
-  const {
-    state: { timerState },
-  } = useTimer();
-  const {
-    state: { tasks, selectedTask },
-  } = useTask();
-
+const TaskList: React.FC<TaskListProps> = ({
+  tasks,
+  timerState,
+  isLoading,
+  selectedTask,
+  inProgressTask,
+  onSelectTask,
+  onResetTask,
+}) => {
   return (
     <Box mb={4}>
       <List.Root gap={3}>
@@ -30,7 +38,15 @@ const TaskList: React.FC<TaskListProps> = ({}) => {
                 zIndex={tasks.length}
                 key={`task-${task.id}`}
               >
-                <TaskCard task={task} />
+                <TaskCard
+                  task={task}
+                  isLoading={isLoading}
+                  timerState={timerState}
+                  inProgressTask={inProgressTask}
+                  isSelected={isSelected}
+                  onSelectTask={onSelectTask}
+                  onResetTask={onResetTask}
+                />
               </Box>
             );
           }
@@ -40,14 +56,22 @@ const TaskList: React.FC<TaskListProps> = ({}) => {
               open={visible}
               key={`task-${task.id}`}
               style={{
-                overflow: "visible", // Prevent inner component to be cut off
+                overflow: "visible",
                 zIndex: index,
                 position: "relative",
                 background: "transparent",
               }}
             >
               <Collapsible.Content>
-                <TaskCard task={task} />
+                <TaskCard
+                  task={task}
+                  isLoading={isLoading}
+                  timerState={timerState}
+                  inProgressTask={inProgressTask}
+                  isSelected={isSelected}
+                  onSelectTask={onSelectTask}
+                  onResetTask={onResetTask}
+                />
               </Collapsible.Content>
             </Collapsible.Root>
           );
