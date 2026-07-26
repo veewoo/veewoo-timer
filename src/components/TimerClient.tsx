@@ -8,7 +8,7 @@ import { useTaskState } from "@/hooks/useTaskState";
 import { useTimerState } from "@/hooks/useTimerState";
 import { MINUTES_25 } from "@/constants";
 import {
-  calculateElapsedTime,
+  getSessionTimerSnapshot,
   formatTimeByDate,
   requestWakeLockForPhone,
 } from "@/utils";
@@ -52,19 +52,23 @@ const TimerClient: React.FC = () => {
   };
 
   const handleTimerStart = async () => {
-    await saveInProgressTaskAsync(selectedTask!.id);
+    await saveInProgressTaskAsync(
+      selectedTask!.id,
+      selectedTask!.remainingTime,
+    );
     await requestWakeLock();
   };
 
-  const handleTimerPause = async (remaining: number) => {
+  const handleTimerPause = async () => {
     if (!selectedTask || !inProgressTask) return;
 
-    const newElapsedTime = calculateElapsedTime(inProgressTask.startTime);
+    const { elapsedSeconds, remainingSeconds } =
+      getSessionTimerSnapshot(inProgressTask);
 
     const newSelectedTask = {
       ...selectedTask,
-      secondsCounted: selectedTask.secondsCounted + newElapsedTime,
-      remainingTime: remaining,
+      secondsCounted: selectedTask.secondsCounted + elapsedSeconds,
+      remainingTime: remainingSeconds,
       lastModified: formatTimeByDate(),
     };
 
@@ -95,14 +99,13 @@ const TimerClient: React.FC = () => {
   };
 
   const handleTimerFinish = async () => {
-    if (!selectedTask) return;
+    if (!selectedTask || !inProgressTask) return;
 
-    const remainingInCycle =
-      MINUTES_25 - (selectedTask.secondsCounted % MINUTES_25);
+    const { elapsedSeconds } = getSessionTimerSnapshot(inProgressTask);
 
     const newSelectedTask = {
       ...selectedTask,
-      secondsCounted: selectedTask.secondsCounted + remainingInCycle,
+      secondsCounted: selectedTask.secondsCounted + elapsedSeconds,
       remainingTime: MINUTES_25,
       lastModified: formatTimeByDate(),
     };
@@ -190,7 +193,8 @@ const TimerClient: React.FC = () => {
   useEffect(() => {
     if (!selectedTask) return;
     if (inProgressTask) {
-      setRemainingTime(selectedTask.remainingTime);
+      const { remainingSeconds } = getSessionTimerSnapshot(inProgressTask);
+      setRemainingTime(remainingSeconds);
       if (timerState !== "active") {
         startTimer();
       }

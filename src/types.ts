@@ -12,6 +12,7 @@ export type Task = {
 export type InProgressTask = {
     id: number;
     startTime: number;
+    sessionStartRemaining: number;
 }
 
 export type TimerState = "active" | "paused" | "stopped";

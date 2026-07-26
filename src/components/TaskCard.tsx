@@ -1,5 +1,5 @@
 import { InProgressTask, Task, TimerState } from "@/types";
-import { calculateElapsedTime, formatTime } from "@/utils";
+import { getSessionTimerSnapshot, formatTime } from "@/utils";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FaRedo } from "react-icons/fa";
 
@@ -33,8 +33,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   const elapsed = formatTime(
-    inProgressTask
-      ? task.secondsCounted + calculateElapsedTime(inProgressTask.startTime)
+    inProgressTask?.id === task.id
+      ? task.secondsCounted +
+          getSessionTimerSnapshot(inProgressTask).elapsedSeconds
       : task.secondsCounted,
   );
 

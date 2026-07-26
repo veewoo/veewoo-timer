@@ -71,7 +71,11 @@ export const useTaskState = () => {
           }
 
           setSelectedTask(newSelectedTask);
-          setInProgressTask(inProgressTask);
+          setInProgressTask({
+            id: inProgressTask.id,
+            startTime: Number(inProgressTask.startTime),
+            sessionStartRemaining: newSelectedTask.remainingTime,
+          });
         }
       },
     },
@@ -85,9 +89,12 @@ export const useTaskState = () => {
     await saveTaskMutation.mutateAsync(task);
   };
 
-  const saveInProgressTaskAsync = async (taskId: number) => {
+  const saveInProgressTaskAsync = async (
+    taskId: number,
+    sessionStartRemaining: number,
+  ) => {
     const startTime = Date.now();
-    setInProgressTask({ id: taskId, startTime });
+    setInProgressTask({ id: taskId, startTime, sessionStartRemaining });
     await saveInProgressTaskMutation.mutateAsync({ taskId, startTime });
   };
 

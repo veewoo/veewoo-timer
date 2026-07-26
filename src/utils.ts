@@ -1,5 +1,3 @@
-import { MINUTES_25 } from "./constants";
-
 export const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
@@ -17,20 +15,18 @@ export const formatTimeByDate = (date: Date = new Date()) => {
   return formattedTime;
 };
 
-export function calculateElapsedTime(startTime?: number) {
-  const startTimeInSecond = startTime
-    ? Math.floor(startTime / 1000) // Convert timestamp to seconds
-    : 0; // Start time in seconds
-  const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-  return currentTime - startTimeInSecond; // Elapsed time in seconds
-}
-
-export function calculateRemainingTimer(
-  currentRemainingTime: number,
-  startTime?: number,
-) {
-  const elapsedTime = calculateElapsedTime(startTime); // Elapsed time in seconds
-  return MINUTES_25 - (elapsedTime % MINUTES_25);
+export function getSessionTimerSnapshot(inProgressTask: {
+  startTime: number;
+  sessionStartRemaining: number;
+}) {
+  const elapsedSeconds = Math.floor(
+    (Date.now() - inProgressTask.startTime) / 1000,
+  );
+  const remainingSeconds = Math.max(
+    0,
+    inProgressTask.sessionStartRemaining - elapsedSeconds,
+  );
+  return { elapsedSeconds, remainingSeconds };
 }
 
 export async function requestWakeLockForPhone() {

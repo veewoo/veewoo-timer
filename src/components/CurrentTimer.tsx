@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
-import { calculateElapsedTime, formatTime } from "@/utils";
+import { getSessionTimerSnapshot, formatTime } from "@/utils";
 import { MINUTES_25 } from "@/constants";
 import { InProgressTask, Task, TimerState } from "@/types";
 
@@ -25,7 +25,7 @@ interface CurrentTimerProps {
   inProgressTask: InProgressTask | null;
   selectedTask: Task | null;
   onTimerStart: () => void;
-  onTimerPause: (remainingTime: number) => void;
+  onTimerPause: () => void;
   onTimerFinish: () => void;
 }
 
@@ -44,16 +44,21 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
   onTimerFinish,
 }) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const onTimerFinishRef = useRef(onTimerFinish);
+  const stopTimerRef = useRef(stopTimer);
+
+  onTimerFinishRef.current = onTimerFinish;
+  stopTimerRef.current = stopTimer;
 
   useEffect(() => {
     if (inProgressTask && timerState === "active") {
       intervalRef.current = setInterval(() => {
-        const newElapsedTime = calculateElapsedTime(inProgressTask.startTime);
-        if (newElapsedTime >= remainingTime) {
-          stopTimer();
-          onTimerFinish();
+        const { remainingSeconds } = getSessionTimerSnapshot(inProgressTask);
+        if (remainingSeconds === 0) {
+          stopTimerRef.current();
+          onTimerFinishRef.current();
         } else {
-          setRemainingTime(remainingTime - newElapsedTime);
+          setRemainingTime(remainingSeconds);
         }
       }, 1000);
     } else {
@@ -62,8 +67,7 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
     return () => {
       clearTimerInterval();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerState]);
+  }, [timerState, inProgressTask, setRemainingTime]);
 
   function clearTimerInterval() {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -76,7 +80,7 @@ const CurrentTimer: React.FC<CurrentTimerProps> = ({
 
   const handlePause = async () => {
     pauseTimer();
-    onTimerPause(remainingTime);
+    onTimerPause();
   };
 
   return (
