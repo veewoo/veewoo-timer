@@ -48,7 +48,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       borderWidth="1px"
       borderRadius="md"
       onClick={handleCardClick}
-      bg={isSelected ? "gray.950" : "white"}
+      bg={isSelected ? "bg.inverted" : "bg.panel"}
     >
       <Flex align="center" gap={3} minH="32px" wrap="nowrap">
         <Text
@@ -57,7 +57,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           minW={0}
           fontSize="sm"
           fontWeight="semibold"
-          color={isSelected ? "white" : "gray.800"}
+          color={isSelected ? "fg.inverted" : "fg"}
           lineClamp={1}
         >
           {task.name}
@@ -66,7 +66,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           as="span"
           flexShrink={0}
           fontSize="sm"
-          color={isSelected ? "whiteAlpha.900" : "gray.600"}
+          color={isSelected ? "fg.inverted" : "fg.muted"}
           style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {elapsed}
@@ -79,7 +79,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             maxW="140px"
             fontSize="xs"
             fontStyle="italic"
-            color={isSelected ? "whiteAlpha.800" : "gray.500"}
+            color={isSelected ? "fg.inverted" : "fg.subtle"}
             lineClamp={1}
           >
             {task.lastModified}

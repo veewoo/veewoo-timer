@@ -20,6 +20,24 @@ describe("TopBar", () => {
 
     expect(screen.getByText("Veewoo Task Timer")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sync" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeInTheDocument();
+  });
+
+  it("toggles between light and dark mode", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <TopBar
+        isLoading={false}
+        selectedTask={null}
+        setRemainingTime={vi.fn()}
+        refetchTasksAsync={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Switch to dark mode" }));
+
+    expect(screen.getByRole("button", { name: "Switch to light mode" })).toBeInTheDocument();
+    expect(document.documentElement).toHaveClass("dark");
   });
 
   it("calls refetchTasksAsync when sync is clicked", async () => {

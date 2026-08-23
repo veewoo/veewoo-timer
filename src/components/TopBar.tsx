@@ -1,7 +1,8 @@
 import { IconButton, Flex, Text, Stack } from "@chakra-ui/react";
-import { FaSync } from "react-icons/fa";
+import { FaMoon, FaSun, FaSync } from "react-icons/fa";
 import { Task } from "@/types";
 import { QueryObserverResult } from "@tanstack/react-query";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface TopBarProps {
   isLoading: boolean;
@@ -22,6 +23,7 @@ const PageHeader: React.FC<TopBarProps> = ({
         Veewoo Task Timer
       </Text>
       <Stack direction="row" gap={2}>
+        <ThemeToggle />
         <RefreshTaskButton
           isLoading={isLoading}
           selectedTask={selectedTask}
@@ -30,6 +32,21 @@ const PageHeader: React.FC<TopBarProps> = ({
         />
       </Stack>
     </Flex>
+  );
+};
+
+const ThemeToggle: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
+  const nextTheme = theme === "light" ? "dark" : "light";
+
+  return (
+    <IconButton
+      size="sm"
+      aria-label={`Switch to ${nextTheme} mode`}
+      onClick={toggleTheme}
+    >
+      {theme === "light" ? <FaMoon /> : <FaSun />}
+    </IconButton>
   );
 };
 

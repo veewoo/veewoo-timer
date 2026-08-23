@@ -2,6 +2,7 @@ import { render, type RenderOptions } from "@testing-library/react";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactElement, ReactNode } from "react";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const createTestQueryClient = () =>
   new QueryClient({
@@ -19,7 +20,9 @@ export function renderWithProviders(
 
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>
+      <ChakraProvider value={defaultSystem}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </ChakraProvider>
     </QueryClientProvider>
   );
 
