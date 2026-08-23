@@ -54,6 +54,26 @@ npm run start
 npm run lint
 ```
 
+### Testing
+
+Run the test suite once:
+
+```bash
+npm test
+```
+
+Watch mode during development:
+
+```bash
+npm run test:watch
+```
+
+Generate a coverage report:
+
+```bash
+npm run test:coverage
+```
+
 ## Learn more
 
 - [Next.js Documentation](https://nextjs.org/docs)
